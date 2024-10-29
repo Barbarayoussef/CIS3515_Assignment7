@@ -1,32 +1,28 @@
 package edu.temple.browsr
 
 import android.os.Bundle
+import android.text.Editable
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.ImageView
+import androidx.lifecycle.ViewModelProvider
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [ControlFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class ControlFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    lateinit var backImage: ImageView
+    lateinit var forwardImage: ImageView
+    lateinit var goImage: ImageView
+    lateinit var urlText:EditText
+    lateinit var Url: String
+    lateinit var webViewModel:WebViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+        webViewModel = ViewModelProvider(requireActivity())[WebViewModel::class.java]
+
     }
 
     override fun onCreateView(
@@ -34,26 +30,61 @@ class ControlFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_control, container, false)
-    }
-
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ControlFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ControlFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+        var layout =inflater.inflate(R.layout.fragment_control, container, false)
+        backImage= layout.findViewById<ImageView>(R.id.back).apply {
+            setOnClickListener{
+                (activity as MainActivity).supportFragmentManager.findFragmentById(R.id.page)?.let { fragment ->
+                    if (fragment is PageFragment) {
+                        fragment.goBack()
+                        //urlText.text=Editable.Factory.getInstance().newEditable(Url)
+                    }
                 }
             }
+        }
+        forwardImage= layout.findViewById<ImageView>(R.id.forward).apply {
+            setOnClickListener{
+                (activity as MainActivity).supportFragmentManager.findFragmentById(R.id.page)?.let { fragment ->
+                    if (fragment is PageFragment) {
+                        fragment.goForward()
+                        //urlText.text=Editable.Factory.getInstance().newEditable(Url)
+                    }
+                }
+            }
+        }
+        goImage= layout.findViewById<ImageView>(R.id.go).apply {
+            setOnClickListener{
+                webViewModel.updateUrl(goTO())
+            }
+        }
+        urlText= layout.findViewById<EditText>(R.id.UrlText)
+        webViewModel.get().observe(requireActivity()) { newUrl ->
+            urlText.text= Editable.Factory.getInstance().newEditable(newUrl)
+        }
+        return layout
     }
-}
+
+
+
+
+
+       fun goTO(): String{
+        Url=urlText.text.toString()
+           Url = urlText.text.toString()
+           if (Url.isNotBlank()) {
+               if (!Url.contains(".") || Url.contains(" ")) {
+                   Url= "https://duckduckgo.com/?q=$Url"
+               } else if (!Url.startsWith("http://") && !Url.startsWith("https://")) {
+                   Url= "https://$Url"
+               } else {
+                   Url
+               }
+           }
+           return Url
+
+       }
+
+    }
+
+
+
+
