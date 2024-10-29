@@ -8,7 +8,6 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <!-- Page Fragment Container: Occupies 80% of screen height -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/page"
         android:name="edu.temple.browsr.PageFragment"
@@ -21,7 +20,7 @@
         app:layout_constraintHeight_percent="0.9"
         tools:layout="@layout/fragment_page" />
 
-    <!-- Control Fragment Container: Occupies remaining 20% of screen height -->
+
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/control"
         android:name="edu.temple.browsr.ControlFragment"
