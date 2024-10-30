@@ -32,7 +32,6 @@ class PageFragment : Fragment() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
                 url?.let {
-                    // Update ViewModel only if URL has changed
                     if (webViewModel.get().value != it) {
                         webViewModel.updateUrl(it)
                     }
@@ -40,14 +39,25 @@ class PageFragment : Fragment() {
             }
 
         }
+        if (savedInstanceState != null) {
+            webView.restoreState(savedInstanceState)
+        } else {
+            // Load URL from ViewModel if this is a fresh start
+            webViewModel.get().value?.let { webView.loadUrl(it) }
+        }
         webViewModel.get().observe(viewLifecycleOwner) { newUrl ->
-            if (newUrl != webView.url) {  // Only load if the URL is different
+            if (newUrl != webView.url) {
                 webView.loadUrl(newUrl)
             }
         }
         //webView.loadUrl()
         return layout
     }
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        webView.saveState(outState)
+    }
+
     fun goBack() {
         if (webView.canGoBack()) {
             webView.goBack()

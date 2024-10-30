@@ -12,12 +12,12 @@ class MainActivity : AppCompatActivity(),ControlFragment.NavigationInterface {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        supportFragmentManager
-            .beginTransaction()
-            .add(R.id.page,PageFragment())
-            .commit()
-
-
+        if (savedInstanceState == null) {
+            supportFragmentManager
+                .beginTransaction()
+                .add(R.id.page, PageFragment())
+                .commit()
+        }
     }
 
     override fun goBack() {

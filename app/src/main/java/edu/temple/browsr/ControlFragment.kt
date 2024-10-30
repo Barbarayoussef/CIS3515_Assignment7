@@ -24,11 +24,8 @@ class ControlFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        // Ensure the activity implements the NavigationInterface
         if (context is NavigationInterface) {
             navigationInterface = context
-        } else {
-            throw ClassCastException("$context must implement NavigationInterface")
         }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
