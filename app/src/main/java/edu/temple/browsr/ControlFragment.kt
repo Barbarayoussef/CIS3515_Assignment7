@@ -1,5 +1,6 @@
 package edu.temple.browsr
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import androidx.fragment.app.Fragment
@@ -18,7 +19,18 @@ class ControlFragment : Fragment() {
     lateinit var urlText:EditText
     lateinit var Url: String
     lateinit var webViewModel:WebViewModel
+    private lateinit var navigationInterface:NavigationInterface
 
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        // Ensure the activity implements the NavigationInterface
+        if (context is NavigationInterface) {
+            navigationInterface = context
+        } else {
+            throw ClassCastException("$context must implement NavigationInterface")
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         webViewModel = ViewModelProvider(requireActivity())[WebViewModel::class.java]
@@ -33,22 +45,13 @@ class ControlFragment : Fragment() {
         var layout =inflater.inflate(R.layout.fragment_control, container, false)
         backImage= layout.findViewById<ImageView>(R.id.back).apply {
             setOnClickListener{
-                (activity as MainActivity).supportFragmentManager.findFragmentById(R.id.page)?.let { fragment ->
-                    if (fragment is PageFragment) {
-                        fragment.goBack()
-                        //urlText.text=Editable.Factory.getInstance().newEditable(Url)
-                    }
-                }
+                navigationInterface.goBack()
+
             }
         }
         forwardImage= layout.findViewById<ImageView>(R.id.forward).apply {
             setOnClickListener{
-                (activity as MainActivity).supportFragmentManager.findFragmentById(R.id.page)?.let { fragment ->
-                    if (fragment is PageFragment) {
-                        fragment.goForward()
-                        //urlText.text=Editable.Factory.getInstance().newEditable(Url)
-                    }
-                }
+                navigationInterface.goForward()
             }
         }
         goImage= layout.findViewById<ImageView>(R.id.go).apply {
@@ -58,17 +61,17 @@ class ControlFragment : Fragment() {
         }
         urlText= layout.findViewById<EditText>(R.id.UrlText)
         webViewModel.get().observe(requireActivity()) { newUrl ->
-            urlText.text= Editable.Factory.getInstance().newEditable(newUrl)
+            urlText.setText(newUrl)
         }
         return layout
     }
 
-
-
-
+    interface NavigationInterface {
+        fun goBack()
+        fun goForward()
+    }
 
        fun goTO(): String{
-        Url=urlText.text.toString()
            Url = urlText.text.toString()
            if (Url.isNotBlank()) {
                if (!Url.contains(".") || Url.contains(" ")) {

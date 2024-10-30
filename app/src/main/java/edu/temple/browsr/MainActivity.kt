@@ -6,8 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
-class MainActivity : AppCompatActivity() {
-
+class MainActivity : AppCompatActivity(),ControlFragment.NavigationInterface {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -17,5 +16,18 @@ class MainActivity : AppCompatActivity() {
             .beginTransaction()
             .add(R.id.page,PageFragment())
             .commit()
+
+
     }
+
+    override fun goBack() {
+        ( supportFragmentManager
+            .findFragmentById(R.id.page) as PageFragment ).goBack()
+    }
+
+    override fun goForward() {
+        ( supportFragmentManager
+            .findFragmentById(R.id.page) as PageFragment ).goForward()
+    }
+
 }

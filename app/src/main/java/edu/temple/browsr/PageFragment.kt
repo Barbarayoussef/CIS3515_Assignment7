@@ -14,6 +14,7 @@ class PageFragment : Fragment() {
     private lateinit var webViewModel: WebViewModel
 
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         webViewModel = ViewModelProvider(requireActivity())[WebViewModel::class.java]
@@ -28,19 +29,25 @@ class PageFragment : Fragment() {
         webView= layout.findViewById(R.id.webView)
         webView.settings.javaScriptEnabled = true
         webView.webViewClient = object : WebViewClient() {
-            override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-                view.loadUrl(url)
-                webViewModel.updateUrl(url) // Update the ViewModel with the new URL
-                return true
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+                url?.let {
+                    // Update ViewModel only if URL has changed
+                    if (webViewModel.get().value != it) {
+                        webViewModel.updateUrl(it)
+                    }
+                }
+            }
+
+        }
+        webViewModel.get().observe(viewLifecycleOwner) { newUrl ->
+            if (newUrl != webView.url) {  // Only load if the URL is different
+                webView.loadUrl(newUrl)
             }
         }
-        //webView.loadUrl("")
-        webViewModel.get().observe(requireActivity()) { newUrl ->
-            webView.loadUrl(newUrl)
-        }
+        //webView.loadUrl()
         return layout
     }
-
     fun goBack() {
         if (webView.canGoBack()) {
             webView.goBack()
